@@ -48,25 +48,22 @@ public class PlayerAgent : Agent
 
         switch (forward)
         {
-            case 0 :agentMove.moveInput = 0;break;
-            case 1 :agentMove.moveInput = 1;break;
-            case 2 :agentMove.moveInput = -1;break;
-            default:break;
+            case 1 :agentMove.moveInput = -1;break;
+            case 2 :agentMove.moveInput = 1;break;
+            default:agentMove.moveInput = 0;break;
         }
 
         switch (rotate)
         {
-            case 0 :agentMove.turnInput = 0;break;
             case 1 :agentMove.turnInput = -1;break;
             case 2 :agentMove.turnInput = 1;break;
-            default:break;
+            default:agentMove.turnInput = 0;break;
         }
 
         switch (shoot)
         {
-            case 0 :agentShoot.fireInput = false;break;
             case 1 :agentShoot.fireInput = true;break;
-            default:break;
+            default:agentShoot.fireInput = false;break;
         }
     }
 
