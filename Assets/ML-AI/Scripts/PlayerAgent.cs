@@ -48,8 +48,8 @@ public class PlayerAgent : Agent
 
         switch (forward)
         {
-            case 1 :agentMove.moveInput = -1;break;
-            case 2 :agentMove.moveInput = 1;break;
+            case 1 :agentMove.moveInput = 1;break;
+            case 2 :agentMove.moveInput = -1;break;
             default:agentMove.moveInput = 0;break;
         }
 
