@@ -11,10 +11,18 @@ public class TankHealthBrain : Complete.TankHealth
         }
     }
 
+    public float CurrentHealth
+    {
+        get
+        {
+            return base.m_CurrentHealth;
+        }
+    }
+
     public new void TakeDamage(float amount)
     {
         // Reduce current health by the amount of damage done.
-        m_CurrentHealth -= amount;
+        base.m_CurrentHealth -= amount;
 
 
         // Change the UI elements appropriately.

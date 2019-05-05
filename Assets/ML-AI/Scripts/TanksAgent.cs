@@ -11,6 +11,8 @@ public class TanksAgent : Agent
     // agent operation
     private TankMovementBrain agentMove;
     private TankShootingBrain agentShoot;
+    private TankHealthBrain agentHealth;
+    public bool _needReset = false;
 
     private RayPerception rayPer;
 
@@ -22,26 +24,31 @@ public class TanksAgent : Agent
         rayPer = GetComponent<RayPerception>();
         agentMove = GetComponent<TankMovementBrain>();
         agentShoot = GetComponent<TankShootingBrain>();
+        agentHealth = GetComponent<TankHealthBrain>();
     }
 
     public override void CollectObservations()
     {
+        // Top Down Ray Percption
         float rayDistance = 50f;
-        float[] rayAngles = { 0f, 45f, 70f, 90f, 110f, 135f, 180f, 240f, 300f };
-        string[] detectableObjects = { "obstacle", "agent" };
-        AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 1f, 0.1f));
-        AddVectorObs(rayPer.Perceive(rayDistance, rayAngles, detectableObjects, 0f, 10f));
+        float[] rayAnglesTD = { 0f, 30f, 50f, 70f, 90f,
+                              110f, 130f, 150f, 180f,
+                              220f, 270f, 320f };
+        string[] detectableObjects = { "obstacle", "agent", "shell" };
+        AddVectorObs(rayPer.Perceive(rayDistance, rayAnglesTD, detectableObjects, 1f, 0.1f));
+        // Buttom Up Ray Perception
+        float[] rayAnglesBU = { 75f, 80f, 85f,
+                              95f, 100f, 105f};
+        AddVectorObs(rayPer.Perceive(rayDistance, rayAnglesBU, detectableObjects, 0.1f, 1f));
+        // Ego State
+        AddVectorObs(agentHealth.CurrentHealth);
         AddVectorObs(transform.InverseTransformDirection(agentRb.velocity));
-        AddVectorObs(transform.InverseTransformDirection(agentRb.angularVelocity));
         AddVectorObs(agentShoot.CurrentLaunchForce);
         AddVectorObs(agentShoot.Fired);
     }
 
     public void MoveAgent(float[] act)
     {
-        // encourage attack
-        AddReward(1f * agentRb.velocity.magnitude / 3000f);
-
         int forward = (int)act[0];
         int rotate = (int)act[1];
         int shoot = (int)act[2];
@@ -69,33 +76,30 @@ public class TanksAgent : Agent
 
     public void TakeDamage(float amount)
     {
-        AddReward(-0.01f * amount);
+        // Dont be hit
+        AddReward(-1f);
     }
 
     public void MakeDamage(float amount)
     {
-        AddReward(0.02f * amount);
+        AddReward(amount);
     }
 
     public void EmptyShot()
     {
-        AddReward(-0.001f);
+        // stop no meaning shots
     }
 
 
     public override void AgentAction(float[] vectorAction, string textAction)
     {
         MoveAgent(vectorAction);
+
+        if (agentHealth.Dead) Done();
     }
 
     public override void AgentReset()
     {
-        //SendMessage("TakeDamage", 100f);
-    }
-
-
-    public override void AgentOnDone()
-    {
-
+        _needReset = true;
     }
 }

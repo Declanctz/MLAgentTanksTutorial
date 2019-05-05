@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class TanksAcademy : Academy
 {
+
     [HideInInspector]
     public GameObject[] agents;
 
